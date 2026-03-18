@@ -140,7 +140,7 @@ export default function ResultPanel({
               value={-calc.totalInstall}
               sub={
                 units > 1
-                  ? `대당 ${formatW(calc.effectiveInstall)} (원가 ${formatW(installCostPerUnit)} − 할인 ${formatW(volumeDiscount)})`
+                  ? `대당 ${formatW(calc.effectiveInstall)} (원가 ${formatW(installCostPerUnit)} − 할인 ${formatW(coreParams.volumeDiscount)})`
                   : `대당 ${formatW(installCostPerUnit)}`
               }
             />
