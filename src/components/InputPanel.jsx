@@ -152,7 +152,7 @@ export default function InputPanel({
           </label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
-              <label style={labelStyle}>설비부담금</label>
+              <label style={labelStyle}>시설부담금</label>
               <NumberInput value={costFacilityCharge} onChange={onFacilityChargeChange} min={0} />
             </div>
             <div>

@@ -140,7 +140,7 @@ export default function ResultPanel({
               value={-calc.totalInstall}
               sub={
                 units > 1
-                  ? `대당 ${formatW(calc.effectiveInstall)} (정가 ${formatW(installCostPerUnit)} → 할인 ${formatW(installCostPerUnit - calc.effectiveInstall)})`
+                  ? `대당 ${formatW(calc.effectiveInstall)} (원가 ${formatW(installCostPerUnit)} − 할인 ${formatW(volumeDiscount)})`
                   : `대당 ${formatW(installCostPerUnit)}`
               }
             />
@@ -166,7 +166,7 @@ export default function ResultPanel({
               sub={includeExtrasInBiz ? `기준: 사업비 ${formatW(calc.baseBiz)}` : undefined}
             />
             <div style={{ borderTop: "1px dashed #333", margin: "8px 0" }} />
-            <Row label="순이익 합계" value={calc.netIncome} highlight="#fff" bold />
+            <Row label="순수익 합계" value={calc.netIncome} highlight="#fff" bold />
           </div>
         </Section>
 
@@ -181,7 +181,7 @@ export default function ResultPanel({
           }}
         >
           <div style={{ fontSize: "12px", color: "#888", marginBottom: "6px" }}>
-            🎯 목표 마진율 {targetMarginRate}% 달성 기준
+            📐 목표 마진율 {targetMarginRate}% 달성 기준
           </div>
           {calc.maxInstallPerUnit >= 0 ? (
             <div style={{ fontSize: "14px" }}>
@@ -202,7 +202,7 @@ export default function ResultPanel({
             </div>
           ) : (
             <div style={{ fontSize: "13px", color: "#f87171", fontWeight: 600 }}>
-              ⚠ 달성 불가 → 고정비만으로 사업비의 {(100 - targetMarginRate).toFixed(0)}%를 초과
+              ⚠ 달성 불가 — 고정비만으로 사업비의 {(100 - targetMarginRate).toFixed(0)}%를 초과
             </div>
           )}
         </div>
@@ -296,7 +296,7 @@ export default function ResultPanel({
       >
         <Section title="설치비 시나리오 비교" accent="#fbbf24">
           <div style={{ fontSize: "11px", color: "#666", marginBottom: "12px" }}>
-            {capacity} · {brand} · {units}대 기준 · 순이익 = 마진 + 컨설팅비
+            {capacity} · {brand} · {units}대 기준 · 순수익 = 마진 + 컨설팅비
           </div>
           <div style={{ overflowX: "auto" }}>
             <table
@@ -309,7 +309,7 @@ export default function ResultPanel({
             >
               <thead>
                 <tr style={{ borderBottom: "2px solid #333" }}>
-                  {["설치비/대", "총원가", "마진", "마진율", "순이익"].map((h) => (
+                  {["설치비/대", "총원가", "마진", "마진율", "순수익"].map((h) => (
                     <th
                       key={h}
                       style={{

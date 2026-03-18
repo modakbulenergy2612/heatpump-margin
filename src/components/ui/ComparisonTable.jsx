@@ -14,7 +14,7 @@ export default function ComparisonTable({ rows, targetMarginRate, accentColor = 
       >
         <thead>
           <tr style={{ borderBottom: "2px solid #333" }}>
-            {["", "사업비", "제품비", "마진", "마진율", "순이익", "만원/kW"].map((h) => (
+            {["", "사업비", "제품비", "마진", "마진율", "순수익", "만원/kW"].map((h) => (
               <th
                 key={h}
                 style={{

@@ -21,7 +21,7 @@ export default function App() {
   const [targetMarginRate, setTargetMarginRate] = useState(10);
   const [showSettings, setShowSettings] = useState(false);
   const [warrantyRate, setWarrantyRate] = useState(5);
-  const [warrantyFeeRate, setWarrantyFeeRate] = useState(0.5);
+  const [warrantyFeeRate, setWarrantyFeeRate] = useState(0.439);
   const [warrantyYears, setWarrantyYears] = useState(3);
 
   const [tankIdx, setTankIdx] = useState(0);
@@ -107,11 +107,11 @@ export default function App() {
                 fontFamily: "'JetBrains Mono', monospace",
               }}
             >
-              시공 현장 마진 시뮬레이터
+              시공 협의 마진 시뮬레이터
             </h1>
           </div>
           <p style={{ fontSize: "13px", color: "#666", margin: "4px 0 0 20px" }}>
-            모닥불에너지 · 설치비 협의 기준 산출
+            소상공인지원사업 · 설치비 협상 기준 산출
           </p>
         </div>
 
@@ -203,7 +203,7 @@ export default function App() {
         />
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#444", marginTop: "24px" }}>
-          모닥불에너지 · 시공현장 내부용
+          모닥불에너지 · 시공협의 내부용
         </div>
       </div>
     </div>
