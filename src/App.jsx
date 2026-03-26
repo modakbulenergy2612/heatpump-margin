@@ -8,6 +8,7 @@ const DEFAULT_PRODUCTS = {
   LG: { "16kW": 410, "25kW": 540, "35kW": 620 },
   "캐리어": { "16kW": 400, "25kW": 520, "35kW": 620 },
 };
+const DEFAULT_INSTALL_COST = { "16kW": 250, "25kW": 300, "35kW": 350 };
 const MOTHER_FEE_RATE = 0.05;
 const SUBSIDY_RATE = 0.7;
 const CONSULTING_FEE = 100;
@@ -232,7 +233,7 @@ export default function App() {
   const [brand, setBrand] = useState("LG");
   const [capacity, setCapacity] = useState("25kW");
   const [units, setUnits] = useState(1);
-  const [installCostPerUnit, setInstallCostPerUnit] = useState(400);
+  const [installCostPerUnit, setInstallCostPerUnit] = useState(DEFAULT_INSTALL_COST["25kW"]);
   const [volumeDiscount, setVolumeDiscount] = useState(0);
   const [salesFeePerUnit, setSalesFeePerUnit] = useState(150);
   const [targetMarginRate, setTargetMarginRate] = useState(10);
@@ -260,7 +261,7 @@ export default function App() {
   const powerTotal = costFacilityCharge + costElecWork;
   const totalExtraCost = equipTotal + powerTotal + costEtc;
 
-  useEffect(() => { setInstallCostPerUnit(units >= 2 ? 350 : 400); }, [units]);
+  useEffect(() => { setInstallCostPerUnit(DEFAULT_INSTALL_COST[capacity] || 300); }, [capacity]);
 
   const coreParams = { bizCost, capacity, units, brand, products, installCostPerUnit, volumeDiscount, salesFeePerUnit, warrantyRate, warrantyFeeRate, warrantyYears, targetMarginRate, extraCost: totalExtraCost, includeExtrasInBiz, includeConsulting };
 
@@ -300,7 +301,7 @@ export default function App() {
         <div style={{ maxWidth: "720px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <img src="/logo.png" height={34} alt="모닥불에너지" style={{ objectFit: "contain" }} />
           <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", color: C.textMuted, textAlign: "right", lineHeight: 1.4 }}>
-            <div style={{ color: C.brand, fontWeight: 700 }}>마진 시뮬레이터</div>
+            <div style={{ color: C.brand, fontWeight: 700 }}>마진 시뮬레이터 v1.1</div>
             <div style={{ color: C.textFaint, fontSize: "10px" }}>소상공인지원사업</div>
           </div>
         </div>
