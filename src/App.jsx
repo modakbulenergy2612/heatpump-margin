@@ -1,4 +1,14 @@
 import { useState, useMemo, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+// ═══════════════════════ Supabase ═══════════════════════
+const supabase = createClient(
+  "https://oajypihbrmsqqhulcaot.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hanlwaWhicm1zcXFodWxjYW90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NTY1NDIsImV4cCI6MjA4OTIzMjU0Mn0.nDhrrBXy8ZnjpG9hcknQ9EaCq3oV9GcqFgGRbNYOcrk"
+);
+
+// ═══════════════════════ 버전 ═══════════════════════
+const APP_VERSION = "v1.2";
 
 // ═══════════════════════ 상수 ═══════════════════════
 const CAPACITIES = ["16kW", "25kW", "35kW"];
@@ -228,6 +238,70 @@ function ComparisonTable({ rows, targetMarginRate, accentColor = C.info }) {
 
 // ═══════════════════════ 메인 ═══════════════════════
 export default function App() {
+  // ── 인증 상태 ──
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signInWithSlack = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "slack_oidc",
+      options: {
+        redirectTo: window.location.href,
+        queryParams: { team: "T096A6RTGTG" },
+      },
+    });
+  };
+  const signOut = async () => { await supabase.auth.signOut(); };
+  const myName = user?.user_metadata?.full_name || user?.user_metadata?.name || (user?.email?.split("@")[0]) || "";
+
+  // ── 로딩 / 로그인 화면 ──
+  if (authLoading) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: C.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: "15px", color: C.textMuted, fontWeight: 600 }}>로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+        <div style={{ background: C.panel, borderRadius: "18px", padding: "40px 32px", maxWidth: "380px", width: "100%", boxShadow: "0 12px 48px rgba(0,0,0,.5)", textAlign: "center" }}>
+          <img src="/logo.png" height={48} alt="모닥불에너지" style={{ objectFit: "contain", marginBottom: "16px" }} />
+          <div style={{ fontSize: "18px", fontWeight: 800, color: C.brand, marginBottom: "6px" }}>시공 협의 마진 시뮬레이터 {APP_VERSION}</div>
+          <div style={{ fontSize: "13px", color: C.textMuted, marginBottom: "32px", lineHeight: 1.6 }}>팀원 전용 서비스입니다.<br />Slack 계정으로 로그인해주세요.</div>
+          <button onClick={signInWithSlack} style={{
+            border: "none", borderRadius: "12px", background: "#4A154B", color: "#fff",
+            padding: "15px 24px", fontSize: "15px", fontWeight: 600, width: "100%",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: "12px",
+            cursor: "pointer", fontFamily: "inherit",
+          }}>
+            <svg width="22" height="22" viewBox="0 0 54 54" fill="none"><path fill="#E01E5A" d="M19.7 30.5a5.3 5.3 0 1 1 0-10.6 5.3 5.3 0 0 1 0 10.6zm0-15.3a5.3 5.3 0 0 1-5.3-5.3V4.7a5.3 5.3 0 0 1 10.6 0v5.2a5.3 5.3 0 0 1-5.3 5.3z" /><path fill="#36C5F0" d="M30.5 19.7a5.3 5.3 0 1 1 10.6 0 5.3 5.3 0 0 1-10.6 0zm15.3 0a5.3 5.3 0 0 1 5.3-5.3h5.2a5.3 5.3 0 0 1 0 10.6h-5.2a5.3 5.3 0 0 1-5.3-5.3z" /><path fill="#2EB67D" d="M34.3 23.5a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 15.3a5.3 5.3 0 0 1 5.3 5.3v5.2a5.3 5.3 0 0 1-10.6 0v-5.2a5.3 5.3 0 0 1 5.3-5.3z" /><path fill="#ECB22E" d="M23.5 34.3a5.3 5.3 0 1 1-10.6 0 5.3 5.3 0 0 1 10.6 0zm-15.3 0a5.3 5.3 0 0 1-5.3 5.3H2.7a5.3 5.3 0 0 1 0-10.6h5.2a5.3 5.3 0 0 1 5.3 5.3z" /></svg>
+            Slack으로 로그인
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 인증 완료: 계산기 본체 ──
+  return <MarginCalculator user={user} myName={myName} signOut={signOut} />;
+}
+
+// ═══════════════════════ 계산기 본체 ═══════════════════════
+function MarginCalculator({ user, myName, signOut }) {
   const [products, setProducts] = useState(DEFAULT_PRODUCTS);
   const [bizCost, setBizCost] = useState(DEFAULT_BIZ_COST);
   const [brand, setBrand] = useState("LG");
@@ -299,10 +373,17 @@ export default function App() {
         boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
       }}>
         <div style={{ maxWidth: "720px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <img src="/logo.png" height={34} alt="모닥불에너지" style={{ objectFit: "contain" }} />
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", color: C.textMuted, textAlign: "right", lineHeight: 1.4 }}>
-            <div style={{ color: C.brand, fontWeight: 700 }}>마진 시뮬레이터 v1.1</div>
-            <div style={{ color: C.textFaint, fontSize: "10px" }}>소상공인지원사업</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <img src="/logo.png" height={34} alt="모닥불에너지" style={{ objectFit: "contain" }} />
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", lineHeight: 1.4 }}>
+              <div style={{ color: C.brand, fontWeight: 700 }}>마진 시뮬레이터 {APP_VERSION}</div>
+              <div style={{ color: C.textFaint, fontSize: "10px" }}>소상공인지원사업</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {user?.user_metadata?.avatar_url && <img src={user.user_metadata.avatar_url} style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", border: "2px solid #e0e0d8" }} alt="" />}
+            <span style={{ fontSize: "12px", color: C.textDim, padding: "3px 8px", borderRadius: "4px", background: C.inputBg, border: `1px solid ${C.inputBorder}` }}>{myName}</span>
+            <button onClick={signOut} style={{ border: `1px solid ${C.inputBorder}`, borderRadius: "6px", background: C.panel, color: C.textMuted, padding: "4px 10px", fontSize: "11px", cursor: "pointer", fontFamily: "inherit" }}>로그아웃</button>
           </div>
         </div>
       </div>
@@ -317,7 +398,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* ── 기준값 설정 패널 ── */}
         {showSettings && (
           <div style={panelStyle}>
             <Section title="용량별 사업비" accent={C.info}>
